@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rifa Costa Grande</title>
+
+<style>
+body{font-family:Arial;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;max-width:500px;margin:auto}
+.num{padding:10px;border:1px solid #000;cursor:pointer}
+.sel{background:green;color:#fff}
+</style>
+</head>
+
+<body>
+
+<h2>SORTEOS COSTA GRANDE</h2>
+<h3>Selecciona tus boletos</h3>
+
+<div class="grid" id="grid"></div>
+
+<br>
+<input type="text" id="nombre" placeholder="Tu nombre"><br><br>
+<input type="text" id="telefono" placeholder="Tu teléfono"><br><br>
+
+<button onclick="pagar()">Pagar</button>
+
+<script>
+const URL_SCRIPT="https://script.google.com/macros/s/AKfycbxOLnw9DHzjU3RwwSFuLGlspv85LAtINj7t1AWSZBTZvHNTh3VkzK34vg5ZJoGjNq7E/exec";
+const whats="521XXXXXXXXXX"; // CAMBIA TU NUMERO
+const precio=100; // CAMBIA PRECIO
+
+let seleccionados=[];
+
+// crear boletos
+for(let i=1;i<=100;i++){
+ let d=document.createElement("div");
+ d.className="num";
+ d.innerText=i;
+ d.onclick=()=>{
+   d.classList.toggle("sel");
+   if(seleccionados.includes(i)){
+     seleccionados=seleccionados.filter(x=>x!==i);
+   }else{
+     seleccionados.push(i);
+   }
+ }
+ document.getElementById("grid").appendChild(d);
+}
+
+function pagar(){
+ let nombre=document.getElementById("nombre").value;
+ let telefono=document.getElementById("telefono").value;
+
+ if(!nombre || seleccionados.length==0){
+   alert("Llena nombre y selecciona boletos");
+   return;
+ }
+
+ fetch(URL_SCRIPT,{
+  method:"POST",
+  body:JSON.stringify({
+    nombre:nombre,
+    telefono:telefono,
+    numeros:seleccionados
+  })
+ });
+
+ let total=seleccionados.length*precio;
+ let msg=`Hola soy ${nombre}, tel ${telefono}, quiero los boletos ${seleccionados}. Total $${total}`;
+ window.open(`https://wa.me/${whats}?text=${encodeURIComponent(msg)}`);
+}
+</script>
+
+</body>
+</html>
